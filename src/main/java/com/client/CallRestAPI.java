@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +30,7 @@ import com.model.Customer;
 import com.model.CustomerLoad;
 import com.model.ThirdPartyIdentifier;
 
-@Component
+@Controller
 public class CallRestAPI /*implements CommandLineRunner*/ {
 
 	@PutMapping("/customer")
@@ -109,7 +110,7 @@ public class CallRestAPI /*implements CommandLineRunner*/ {
 		
 	}
 
-/*	@Override
+	/*@Override
 	public void run(String... args) throws Exception {
 		
 		CusAddress customerAddress = new CusAddress();
@@ -122,7 +123,7 @@ public class CallRestAPI /*implements CommandLineRunner*/ {
 		
 		CusBankAcc.setAccNumber("12384312");
 		CusBankAcc.setSortCode("182030");
-		updateCustomer(new Customer("T000000055/1", "Abdul", "Doctor", "0745631688", customerAddress, CusBankAcc));
+		updateCustomer(new Customer("T000000058/1", "Noussair", "Doctor", "0745631688", customerAddress, CusBankAcc));
 
 	}*/
 
