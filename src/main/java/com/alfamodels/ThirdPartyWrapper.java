@@ -1,5 +1,8 @@
 package com.alfamodels;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ThirdPartyWrapper {
 	ThirdParty ThirdParty; 
 	

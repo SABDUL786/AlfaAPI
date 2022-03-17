@@ -1,5 +1,8 @@
 package com.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.expression.spel.ast.Identifier;
@@ -31,16 +34,24 @@ import com.model.CustomerLoad;
 import com.model.ThirdPartyIdentifier;
 
 @Controller
-public class CallRestAPI /*implements CommandLineRunner*/ {
+public class CallRestAPI /* implements CommandLineRunner */ {
+	
+
+	public static final String USER_NAME = "fATEwgK6D8po0GIjcdJVJPrN7IqzKnCbQ6IWiGDRn4CsRcrE";
+	public static final String PASSWORD = "U6J6c75eTKvBPAI2LWmuooMA410TFN0djulb551FQyKr9OtC";
+	public static final String BASE_URL = "https://sandbox.teamwill.alfa.technology/json";
+	
+	Logger  logger = LoggerFactory.getLogger(CallRestAPI.class);
+	
+	@Autowired
+	ThirdPartyWrapper thirdpartywrapper;
 
 	@PutMapping("/customer")
 
 	public Object updateCustomer(@RequestBody Customer customer) {
+		
 
-		RestTemplate rest = new RestTemplateBuilder()
-				.basicAuthentication("fATEwgK6D8po0GIjcdJVJPrN7IqzKnCbQ6IWiGDRn4CsRcrE",
-						"U6J6c75eTKvBPAI2LWmuooMA410TFN0djulb551FQyKr9OtC")
-				.build();
+		RestTemplate rest = new RestTemplateBuilder().basicAuthentication(USER_NAME, PASSWORD).build();
 
 		CustomerLoad customerLoad = new CustomerLoad();
 		ThirdPartyIdentifier indetifier = new ThirdPartyIdentifier();
@@ -48,37 +59,33 @@ public class CallRestAPI /*implements CommandLineRunner*/ {
 		indetifier.setBillingAddressNumber(Integer.parseInt(customer.getCusRef().split("/")[1]));
 		customerLoad.setThirdPartyIdentifier(indetifier);
 
-		String baseURL = "https://sandbox.teamwill.alfa.technology/json";
-
-		String url1 = baseURL + "/third-party/v1/third-party/saveIndividual";
-		String url2 = baseURL + "/third-party/v1/third-party/saveBankAccount";
-		String url3 = baseURL + "/third-party/v1/third-party/loadThirdParty";
+		String url1 = BASE_URL + "/third-party/v1/third-party/saveIndividual";
+		String url2 = BASE_URL + "/third-party/v1/third-party/saveBankAccount";
+		String url3 = BASE_URL + "/third-party/v1/third-party/loadThirdParty";
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-	
 
 		ResponseEntity<ThirdParty> thirdParty = rest.postForEntity(url3, customerLoad, ThirdParty.class);
 
 		mapRequestParams(customer, thirdParty.getBody());
+
 		
-		ThirdPartyWrapper thirdpartywrapper = new ThirdPartyWrapper();
 		thirdpartywrapper.setThirdParty(thirdParty.getBody());
 		thirdpartywrapper.setNarrative("test");
 		HttpEntity<ThirdPartyWrapper> requestEntity = new HttpEntity<ThirdPartyWrapper>(thirdpartywrapper, headers);
 
-	
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonInString = null;
 		try {
-			 jsonInString = mapper.writeValueAsString(thirdpartywrapper);
+			jsonInString = mapper.writeValueAsString(thirdpartywrapper);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e.getMessage();
 		}
+		logger.trace(jsonInString);
 
-		ResponseEntity<ThirdPartyIdentifier> response = rest.exchange(url1, HttpMethod.PUT, requestEntity, ThirdPartyIdentifier.class);
-		
+		ResponseEntity<ThirdPartyIdentifier> response = rest.exchange(url1, HttpMethod.PUT, requestEntity,
+				ThirdPartyIdentifier.class);
 
 		return response;
 
@@ -88,43 +95,43 @@ public class CallRestAPI /*implements CommandLineRunner*/ {
 
 		thirdParty.setOccupation(customer.getCusJob());
 		thirdParty.setTelephoneNumber(customer.getCusPhoneNo());
-		
+
 		BillingAddress billingaddress = thirdParty.getBillingAddress();
 		billingaddress.setCountry(customer.getCusAddress().getCountry());
 		billingaddress.setLine5(customer.getCusAddress().getPostalCode());
 		billingaddress.setLine1(customer.getCusAddress().getAddress());
-		
+
 		BankDetails bankDetails = thirdParty.getBankDetails();
-		
+
 		AccountNumber accountNumber = bankDetails.getAccountNumber();
 		accountNumber.setValue(customer.getCusBankAcc().getAccNumber());
 		bankDetails.setAccountNumber(accountNumber);
-		
+
 		SortCode sortCode = bankDetails.getSortCode();
 		sortCode.setValue(customer.getCusBankAcc().getSortCode());
 		bankDetails.setSortCode(sortCode);
-		
+
 		thirdParty.setBankDetails(bankDetails);
 
 		thirdParty.setBillingAddress(billingaddress);
-		
+
 	}
 
-	/*@Override
-	public void run(String... args) throws Exception {
-		
-		CusAddress customerAddress = new CusAddress();
-		
-		CusBankAcc CusBankAcc = new CusBankAcc();
-		
-		customerAddress.setAddress("483 Windsor Lane, Kensington, London 1");
-		customerAddress.setCountry("GB");
-		customerAddress.setPostalCode("W1 9XY");
-		
-		CusBankAcc.setAccNumber("12384312");
-		CusBankAcc.setSortCode("182030");
-		updateCustomer(new Customer("T000000058/1", "Noussair", "Doctor", "0745631688", customerAddress, CusBankAcc));
-
-	}*/
+	/*
+	 * @Override public void run(String... args) throws Exception {
+	 * 
+	 * CusAddress customerAddress = new CusAddress();
+	 * 
+	 * CusBankAcc CusBankAcc = new CusBankAcc();
+	 * 
+	 * customerAddress.setAddress("483 Windsor Lane, Kensington, London 1");
+	 * customerAddress.setCountry("GB"); customerAddress.setPostalCode("W1 9XY");
+	 * 
+	 * CusBankAcc.setAccNumber("12384312"); CusBankAcc.setSortCode("182030");
+	 * updateCustomer(new Customer("T000000058/1", "Noussair", "Doctor",
+	 * "0745631688", customerAddress, CusBankAcc));
+	 * 
+	 * }
+	 */
 
 }
