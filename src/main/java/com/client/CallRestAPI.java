@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 
+import com.alfaconstants.AlfaConstants;
 import com.alfamodels.AccountNumber;
 import com.alfamodels.Address;
 import com.alfamodels.BankDetails;
@@ -36,10 +37,6 @@ import com.model.ThirdPartyIdentifier;
 @Controller
 public class CallRestAPI /* implements CommandLineRunner */ {
 	
-
-	public static final String USER_NAME = "fATEwgK6D8po0GIjcdJVJPrN7IqzKnCbQ6IWiGDRn4CsRcrE";
-	public static final String PASSWORD = "U6J6c75eTKvBPAI2LWmuooMA410TFN0djulb551FQyKr9OtC";
-	public static final String BASE_URL = "https://sandbox.teamwill.alfa.technology/json";
 	
 	Logger  logger = LoggerFactory.getLogger(CallRestAPI.class);
 	
@@ -51,7 +48,7 @@ public class CallRestAPI /* implements CommandLineRunner */ {
 	public Object updateCustomer(@RequestBody Customer customer) {
 		
 
-		RestTemplate rest = new RestTemplateBuilder().basicAuthentication(USER_NAME, PASSWORD).build();
+		RestTemplate rest = new RestTemplateBuilder().basicAuthentication(AlfaConstants.USER_NAME, AlfaConstants.PASSWORD).build();
 
 		CustomerLoad customerLoad = new CustomerLoad();
 		ThirdPartyIdentifier indetifier = new ThirdPartyIdentifier();
@@ -59,9 +56,9 @@ public class CallRestAPI /* implements CommandLineRunner */ {
 		indetifier.setBillingAddressNumber(Integer.parseInt(customer.getCusRef().split("/")[1]));
 		customerLoad.setThirdPartyIdentifier(indetifier);
 
-		String url1 = BASE_URL + "/third-party/v1/third-party/saveIndividual";
-		String url2 = BASE_URL + "/third-party/v1/third-party/saveBankAccount";
-		String url3 = BASE_URL + "/third-party/v1/third-party/loadThirdParty";
+		String url1 = AlfaConstants.BASE_URL + "/third-party/v1/third-party/saveIndividual";
+		String url2 =  AlfaConstants.BASE_URL + "/third-party/v1/third-party/saveBankAccount";
+		String url3 =  AlfaConstants.BASE_URL + "/third-party/v1/third-party/loadThirdParty";
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
